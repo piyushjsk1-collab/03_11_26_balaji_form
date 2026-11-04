@@ -234,47 +234,60 @@
 
   <!-- SCRIPT: GOOGLE SHEET INTEGRATION & FORM HANDLER -->
   <script>
-    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+   // ⭐ Apna Google Apps Script Web App URL yaha paste karein:
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7-UFj8tbT-LsOccK-EJwB_CF2dO9sp26mL-QW9QHWivrafflglDL01Zbjmwmo3tuWtA/exec";
 
-    function handleRegister(e) {
-      e.preventDefault();
-      
-      const fullName = document.getElementById('fullName').value.trim();
-      const countryCode = document.getElementById('countryCode').value;
-      const mobileNumber = document.getElementById('mobileNumber').value.trim();
-      const email = document.getElementById('emailAddress').value.trim();
-      const fullMobile = countryCode + " " + mobileNumber;
-      
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.innerHTML = "<span>Submitting...</span>";
-      submitBtn.disabled = true;
+function handleRegister(e) {
+  e.preventDefault();
+  
+  const fullName = document.getElementById('fullName').value.trim();
+  const countryCode = document.getElementById('countryCode').value;
+  const mobileNumber = document.getElementById('mobileNumber').value.trim();
+  const email = document.getElementById('emailAddress').value.trim();
+  const fullMobile = countryCode + " " + mobileNumber;
+  
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.innerHTML = "<span>Submitting...</span>";
+  submitBtn.disabled = true;
 
-      if (GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
-        fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            name: fullName, 
-            mobile: fullMobile, 
-            email: email, 
-            date: new Date().toLocaleString() 
-          })
-        }).catch(err => console.log("Sheet save error:", err));
-      }
+  // Data payload
+  const formData = {
+    name: fullName,
+    mobile: fullMobile,
+    email: email,
+    date: new Date().toLocaleString()
+  };
 
-      setTimeout(function() {
-        const modalMessage = document.getElementById('modalMessage');
-        modalMessage.innerHTML = `Thank you <strong>${fullName}</strong>! Your consultation request with number <span class="text-emerald-400">${fullMobile}</span> has been successfully saved. Our corporate advisor will call you shortly.`;
-        
-        const modal = document.getElementById('successModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        
-        submitBtn.innerHTML = `<span>Book Free Consultation</span> <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-chevron-right"></i></div>`;
-        submitBtn.disabled = false;
-      }, 600);
-    }
+  // Send Data to Google Sheet via Fetch API
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8",
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Success:", data);
+  })
+  .catch(err => {
+    console.log("Sheet save error:", err);
+  });
+
+  // Show Success Modal
+  setTimeout(function() {
+    const modalMessage = document.getElementById('modalMessage');
+    modalMessage.innerHTML = `Welcome <strong>${fullName}</strong>! Your account has been successfully registered with <span class="text-blue-400">${fullMobile}</span> & saved to database.`;
+    
+    const modal = document.getElementById('successModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    submitBtn.innerHTML = `<span>Register Now</span> <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-chevron-right"></i></div>`;
+    submitBtn.disabled = false;
+  }, 600);
+}
+
 
     function closeModal() {
       const modal = document.getElementById('successModal');
